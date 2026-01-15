@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"context"
@@ -7,6 +7,27 @@ import (
 
 	"github.com/redis/go-redis/v9"
 )
+
+type Repository interface {
+	Save(ctx context.Context, key string, url string, ttl time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+}
+
+type redisRepo struct {
+	client *redis.Client
+}
+
+func (rr *redisRepo) Get(ctx context.Context, key string) (string, error) {
+	return rr.client.Get(ctx, key).Result()
+}
+
+func (rr *redisRepo) Save(ctx context.Context, key string, url string, ttl time.Duration) error {
+	return rr.client.Set(ctx, key, url, ttl).Err()
+}
+
+func NewRedisRepository(client *redis.Client) Repository {
+	return &redisRepo{client: client}
+}
 
 type Config struct {
 	Addr        string        `yaml:"addr"`
