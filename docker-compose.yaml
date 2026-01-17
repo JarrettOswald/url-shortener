@@ -9,16 +9,13 @@ services:
       - "6379:6379"
     volumes:
       - ./redis_data:/data
-    # --requirepass устанавливает пароль
     command: redis-server --requirepass "test1234" --appendonly yes
 
-  # Админка для проверки
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: redis-ui
     restart: always
     environment:
-      # Формат подключения: хост:порт:база:пароль
       - REDIS_HOSTS=local:redis:6379:0:test1234
     ports:
       - "8081:8081"

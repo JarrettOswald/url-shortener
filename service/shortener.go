@@ -4,7 +4,7 @@ import (
 	"context"
 	"hash/fnv"
 	"strings"
-	"url-shortener/internal/repository"
+	"url-shortener/repository"
 )
 
 type ShortenerService interface {

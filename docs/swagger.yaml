@@ -1,0 +1,92 @@
+basePath: /api/v1
+definitions:
+  http.errorResponse:
+    properties:
+      error:
+        example: url not found
+        type: string
+    type: object
+  http.shortenRequest:
+    properties:
+      url:
+        example: https://example.com
+        type: string
+    required:
+    - url
+    type: object
+  http.shortenResponse:
+    properties:
+      url:
+        example: abc123
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /api/v1/:
+    post:
+      consumes:
+      - application/json
+      description: Create a shortened URL from a long URL
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.shortenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.shortenResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Shorten URL
+      tags:
+      - urls
+  /api/v1/{key}:
+    get:
+      description: Redirect to the original URL by short key
+      parameters:
+      - description: Short URL key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "301":
+          description: Redirect to original URL
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Get original URL
+      tags:
+      - urls
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
