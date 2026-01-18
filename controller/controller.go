@@ -27,10 +27,10 @@ type errorResponse struct {
 	Error string `json:"error" example:"url not found"`
 }
 
-// Create godoc
+// create godoc
 //
 //	@Summary		Shorten URL
-//	@Description	Create a shortened URL from a long URL
+//	@Description	create a shortened URL from a long URL
 //	@Tags			urls
 //	@Accept			json
 //	@Produce		json
@@ -38,22 +38,22 @@ type errorResponse struct {
 //	@Success		200		{object}	shortenResponse
 //	@Failure		500		{object}	errorResponse
 //	@Router			/api/v1/ [post]
-func (h *Controller) Create(ctx *gin.Context) {
+func (c *Controller) create(ctx *gin.Context) {
 	var req shortenRequest
-	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse{Error: "failed to shorten url"})
 	}
 
-	shortKey := h.service.ShortenURL(ctx, req.URL)
+	shortKey := c.service.ShortenURL(ctx, req.URL)
 
 	ctx.JSON(http.StatusOK, shortenResponse{
 		URL: shortKey,
 	})
 }
 
-// Get godoc
+// get godoc
 //
-//	@Summary		Get original URL
+//	@Summary		get original URL
 //	@Description	Redirect to the original URL by short key
 //	@Tags			urls
 //	@Produce		json
@@ -61,10 +61,10 @@ func (h *Controller) Create(ctx *gin.Context) {
 //	@Success		301	{string}	string	"Redirect to original URL"
 //	@Failure		404	{object}	errorResponse
 //	@Router			/api/v1/{key} [get]
-func (h *Controller) Get(ctx *gin.Context) {
+func (c *Controller) get(ctx *gin.Context) {
 	key := ctx.Param("key")
 
-	originUrl, err := h.service.GetOriginalURL(ctx, key)
+	originUrl, err := c.service.GetOriginalURL(ctx, key)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, errorResponse{Error: "url not found"})
 		return
@@ -73,10 +73,10 @@ func (h *Controller) Get(ctx *gin.Context) {
 	ctx.Redirect(http.StatusMovedPermanently, originUrl)
 }
 
-func (h *Controller) RegisterRoutes(router *gin.Engine) {
+func (c *Controller) RegisterRoutes(router *gin.Engine) {
 	api := router.Group("/api/v1")
 	{
-		api.POST("/", h.Create)
-		api.GET("/:key", h.Get)
+		api.POST("/", c.create)
+		api.GET("/:key", c.get)
 	}
 }
