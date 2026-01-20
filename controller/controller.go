@@ -42,6 +42,7 @@ func (c *Controller) create(ctx *gin.Context) {
 	var req shortenRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse{Error: "failed to shorten url"})
+		return
 	}
 
 	shortKey := c.service.ShortenURL(ctx, req.URL)
